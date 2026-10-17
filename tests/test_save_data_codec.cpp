@@ -9,6 +9,9 @@ int main() {
     source.objective_required = 5u;
     source.items.push_back(acunity360::SaveItem{7u, 4u});
     source.items.push_back(acunity360::SaveItem{9u, 1u});
+    source.equipment.main_hand = 101u;
+    source.equipment.tool = 202u;
+    source.equipment.outfit = 303u;
 
     std::vector<std::uint8_t> bytes;
     assert(acunity360::SaveDataCodec::encode(source, bytes));
@@ -22,6 +25,9 @@ int main() {
     assert(decoded.items.size() == 2u);
     assert(decoded.items[0].item_id == 7u && decoded.items[0].quantity == 4u);
     assert(decoded.items[1].item_id == 9u && decoded.items[1].quantity == 1u);
+    assert(decoded.equipment.main_hand == 101u);
+    assert(decoded.equipment.tool == 202u);
+    assert(decoded.equipment.outfit == 303u);
 
     std::vector<std::uint8_t> corrupt = bytes;
     corrupt[8] ^= 1u;
