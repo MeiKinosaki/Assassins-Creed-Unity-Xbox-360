@@ -7,6 +7,9 @@ int main() {
     assert(original.inventory().add(21u, 1u));
     assert(original.objectiveTracker().configure(77u, 8u));
     assert(original.objectiveTracker().advance(77u, 5u));
+    assert(original.equipment().equip(acunity360::EquipmentSlot::MainHand, 501u));
+    assert(original.equipment().equip(acunity360::EquipmentSlot::Tool, 502u));
+    assert(original.equipment().equip(acunity360::EquipmentSlot::Outfit, 503u));
 
     acunity360::SaveSnapshot snapshot;
     assert(acunity360::GameplaySaveAdapter::capture(original, snapshot));
@@ -25,6 +28,9 @@ int main() {
     assert(restored.objectiveTracker().configured());
     assert(restored.objectiveTracker().current().current == 5u);
     assert(restored.objectiveTracker().current().required == 8u);
+    assert(restored.equipment().current().main_hand == 501u);
+    assert(restored.equipment().current().tool == 502u);
+    assert(restored.equipment().current().outfit == 503u);
 
     assert(!acunity360::GameplaySaveAdapter::restoreIntoFreshGame(decoded, restored));
 
