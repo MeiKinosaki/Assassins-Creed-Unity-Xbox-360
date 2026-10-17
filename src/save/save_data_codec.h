@@ -34,6 +34,9 @@ public:
         if (snapshot.objective_progress > snapshot.objective_required) return false;
         for (std::size_t i = 0; i < snapshot.items.size(); ++i) {
             if (snapshot.items[i].item_id == 0u || snapshot.items[i].quantity == 0u) return false;
+            for (std::size_t j = 0; j < i; ++j) {
+                if (snapshot.items[j].item_id == snapshot.items[i].item_id) return false;
+            }
         }
 
         out.clear();
@@ -78,6 +81,9 @@ public:
             const std::size_t offset = header_size + i * 8u;
             SaveItem item = { read32(bytes, offset), read32(bytes, offset + 4u) };
             if (item.item_id == 0u || item.quantity == 0u) return false;
+            for (std::size_t j = 0; j < candidate.items.size(); ++j) {
+                if (candidate.items[j].item_id == item.item_id) return false;
+            }
             candidate.items.push_back(item);
         }
         out = candidate;
