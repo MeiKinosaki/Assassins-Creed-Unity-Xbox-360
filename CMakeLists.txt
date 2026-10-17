@@ -24,7 +24,7 @@ foreach(test_name
     add_executable(${test_name} tests/${test_name}.cpp)
     target_link_libraries(${test_name} PRIVATE acunity360_gameplay)
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-        target_compile_options(${test_name} PRIVATE -Wall -Wextra -Werror -pedantic)
+        target_compile_options(${test_name} PRIVATE -Wall -Wextra -Werror -pedantic -UNDEBUG)
     endif()
     add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach()
