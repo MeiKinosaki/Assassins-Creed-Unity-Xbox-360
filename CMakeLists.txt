@@ -9,6 +9,7 @@ add_library(acunity360_gameplay INTERFACE)
 target_include_directories(acunity360_gameplay INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gameplay
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/save
 )
 
 enable_testing()
@@ -18,6 +19,7 @@ foreach(test_name
     test_gameplay_event_queue
     test_objective_tracker
     test_gameplay_systems
+    test_save_data_codec
 )
     add_executable(${test_name} tests/${test_name}.cpp)
     target_link_libraries(${test_name} PRIVATE acunity360_gameplay)
