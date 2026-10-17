@@ -5,8 +5,6 @@
 
 namespace acunity360 {
 
-// Bridges the portable save format to gameplay data. Restore is intentionally
-// limited to a fresh GameplaySystems instance to avoid partial overwrite.
 class GameplaySaveAdapter {
 public:
     static bool capture(const GameplaySystems& game, SaveSnapshot& out) {
@@ -18,6 +16,7 @@ public:
             snapshot.objective_progress = p.current;
             snapshot.objective_required = p.required;
         }
+        snapshot.equipment = game.equipment().current();
 
         const std::vector<InventoryStack>& stacks = game.inventory().stacks();
         if (stacks.size() > SaveDataCodec::kMaxItems) return false;
@@ -25,7 +24,6 @@ public:
             SaveItem item = {stacks[i].item_id, stacks[i].quantity};
             snapshot.items.push_back(item);
         }
-
         std::vector<std::uint8_t> validation;
         if (!SaveDataCodec::encode(snapshot, validation)) return false;
         out = snapshot;
@@ -33,15 +31,15 @@ public:
     }
 
     static bool restoreIntoFreshGame(const SaveSnapshot& snapshot, GameplaySystems& game) {
+        const EquipmentLoadout& current_equipment = game.equipment().current();
         if (game.inventory().occupiedSlots() != 0u || game.objectiveTracker().configured() ||
-            game.pendingEvents() != 0u) return false;
+            game.pendingEvents() != 0u || current_equipment.main_hand != 0u ||
+            current_equipment.tool != 0u || current_equipment.outfit != 0u) return false;
         if (snapshot.items.size() > game.inventory().capacity() ||
             snapshot.items.size() > SaveDataCodec::kMaxItems) return false;
         if ((snapshot.objective_id == 0u) != (snapshot.objective_required == 0u) ||
             snapshot.objective_progress > snapshot.objective_required) return false;
 
-        // Prevalidate all item entries and reject duplicate IDs so restoration
-        // cannot silently merge malformed or ambiguous save records.
         for (std::size_t i = 0; i < snapshot.items.size(); ++i) {
             if (snapshot.items[i].item_id == 0u || snapshot.items[i].quantity == 0u) return false;
             for (std::size_t j = i + 1u; j < snapshot.items.size(); ++j) {
@@ -49,7 +47,6 @@ public:
             }
         }
 
-        // All possible failures are checked before mutating the target.
         for (std::size_t i = 0; i < snapshot.items.size(); ++i) {
             if (!game.inventory().add(snapshot.items[i].item_id, snapshot.items[i].quantity)) return false;
         }
@@ -58,6 +55,7 @@ public:
             if (snapshot.objective_progress > 0u &&
                 !game.objectiveTracker().advance(snapshot.objective_id, snapshot.objective_progress)) return false;
         }
+        game.equipment().restore(snapshot.equipment);
         return true;
     }
 };
