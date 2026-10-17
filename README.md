@@ -8,6 +8,7 @@ This repository is an **experimental, independent porting/reimplementation scaff
 - FIFO gameplay event queue.
 - Single-objective progress tracker.
 - Equipment loadout slots: main hand, tool, outfit.
+- Platform-service interfaces for clock, input, storage and logging, ready for platform-specific implementations.
 - Versioned little-endian save snapshot codec with a checksum.
 - Adapter that captures/restores inventory, objective progress and equipment.
 - CMake build and GitHub Actions tests using standard C++11.
