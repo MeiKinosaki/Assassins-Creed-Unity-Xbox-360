@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <vector>
+#include "../gameplay/equipment_system.h"
 
 namespace acunity360 {
 
@@ -16,23 +17,21 @@ struct SaveSnapshot {
     std::uint32_t objective_progress;
     std::uint32_t objective_required;
     std::vector<SaveItem> items;
+    EquipmentLoadout equipment;
 
-    SaveSnapshot() : objective_id(0), objective_progress(0), objective_required(0), items() {}
+    SaveSnapshot() : objective_id(0), objective_progress(0), objective_required(0), items(), equipment() {}
 };
 
-// Versioned, little-endian format. This module intentionally serializes a data
-// snapshot rather than engine objects or proprietary game assets.
 class SaveDataCodec {
 public:
-    static const std::uint32_t kMagic = 0x30365541u; // "AU60" in little endian
-    static const std::uint16_t kVersion = 1u;
+    static const std::uint32_t kMagic = 0x30365541u;
+    static const std::uint16_t kVersion = 2u;
     static const std::size_t kMaxItems = 256u;
 
     static bool encode(const SaveSnapshot& snapshot, std::vector<std::uint8_t>& out) {
         if (snapshot.items.size() > kMaxItems) return false;
         if ((snapshot.objective_id == 0u) != (snapshot.objective_required == 0u)) return false;
         if (snapshot.objective_progress > snapshot.objective_required) return false;
-
         for (std::size_t i = 0; i < snapshot.items.size(); ++i) {
             if (snapshot.items[i].item_id == 0u || snapshot.items[i].quantity == 0u) return false;
         }
@@ -44,6 +43,9 @@ public:
         put32(out, snapshot.objective_id);
         put32(out, snapshot.objective_progress);
         put32(out, snapshot.objective_required);
+        put32(out, snapshot.equipment.main_hand);
+        put32(out, snapshot.equipment.tool);
+        put32(out, snapshot.equipment.outfit);
         for (std::size_t i = 0; i < snapshot.items.size(); ++i) {
             put32(out, snapshot.items[i].item_id);
             put32(out, snapshot.items[i].quantity);
@@ -53,10 +55,9 @@ public:
     }
 
     static bool decode(const std::vector<std::uint8_t>& bytes, SaveSnapshot& out) {
-        const std::size_t header_size = 4u + 2u + 2u + 4u + 4u + 4u;
+        const std::size_t header_size = 4u + 2u + 2u + 4u + 4u + 4u + 4u + 4u + 4u;
         if (bytes.size() < header_size + 4u) return false;
         if (read32(bytes, 0u) != kMagic || read16(bytes, 4u) != kVersion) return false;
-
         const std::uint16_t count = read16(bytes, 6u);
         if (count > kMaxItems) return false;
         const std::size_t expected = header_size + static_cast<std::size_t>(count) * 8u + 4u;
@@ -67,6 +68,9 @@ public:
         candidate.objective_id = read32(bytes, 8u);
         candidate.objective_progress = read32(bytes, 12u);
         candidate.objective_required = read32(bytes, 16u);
+        candidate.equipment.main_hand = read32(bytes, 20u);
+        candidate.equipment.tool = read32(bytes, 24u);
+        candidate.equipment.outfit = read32(bytes, 28u);
         if ((candidate.objective_id == 0u) != (candidate.objective_required == 0u)) return false;
         if (candidate.objective_progress > candidate.objective_required) return false;
 
