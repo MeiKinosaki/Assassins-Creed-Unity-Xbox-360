@@ -40,5 +40,15 @@ int main() {
     acunity360::SaveSnapshot invalid;
     invalid.items.push_back(acunity360::SaveItem{0u, 1u});
     assert(!acunity360::SaveDataCodec::encode(invalid, bytes));
+
+    invalid = acunity360::SaveSnapshot();
+    invalid.objective_id = 1u;
+    invalid.objective_required = 0u;
+    assert(!acunity360::SaveDataCodec::encode(invalid, bytes));
+
+    invalid = acunity360::SaveSnapshot();
+    invalid.items.push_back(acunity360::SaveItem{7u, 1u});
+    invalid.items.push_back(acunity360::SaveItem{7u, 2u});
+    assert(!acunity360::SaveDataCodec::encode(invalid, bytes));
     return 0;
 }
