@@ -3,25 +3,24 @@
 #include "gameplay_event_queue.h"
 #include "inventory_system.h"
 #include "objective_tracker.h"
+#include "equipment_system.h"
 
 namespace acunity360 {
 
-// Thin orchestration layer; engine/input/animation hooks are intentionally external.
 class GameplaySystems {
 public:
     explicit GameplaySystems(std::uint32_t inventory_capacity)
-        : inventory_(inventory_capacity) {}
+        : inventory_(inventory_capacity), objectives_(), equipment_(), events_() {}
 
     InventorySystem& inventory() { return inventory_; }
     const InventorySystem& inventory() const { return inventory_; }
-
     ObjectiveTracker& objectiveTracker() { return objectives_; }
     const ObjectiveTracker& objectiveTracker() const { return objectives_; }
+    EquipmentSystem& equipment() { return equipment_; }
+    const EquipmentSystem& equipment() const { return equipment_; }
 
     void postEvent(const GameplayEvent& event) { events_.enqueue(event); }
 
-    // Processes all queued events in FIFO order. ItemCollected expects a positive
-    // quantity in value; ObjectiveProgress expects a positive progress amount.
     std::size_t processEvents() {
         std::size_t processed = 0;
         GameplayEvent event = { GameplayEventType::ObjectiveProgress, 0u, 0 };
@@ -36,8 +35,6 @@ public:
                     objectives_.advance(event.subject_id, amount);
                     break;
                 case GameplayEventType::InteractionCompleted:
-                    // Interaction is surfaced as an event; mission-specific
-                    // interpretation belongs to a higher-level mission adapter.
                     break;
                 }
             }
@@ -51,6 +48,7 @@ public:
 private:
     InventorySystem inventory_;
     ObjectiveTracker objectives_;
+    EquipmentSystem equipment_;
     GameplayEventQueue events_;
 };
 
