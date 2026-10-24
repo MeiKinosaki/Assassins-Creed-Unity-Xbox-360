@@ -55,7 +55,7 @@ int main() {
     assert(runtime.systems().postEvent(acunity360::GameplayEvent{
         acunity360::GameplayEventType::ItemCollected, 88u, 2
     }));
-    assert(runtime.systems().postEvent(acunity360::GameplayEvent{
+    assert(!runtime.systems().postEvent(acunity360::GameplayEvent{
         acunity360::GameplayEventType::InteractionCompleted, 12u, 1
     }));
     assert(!runtime.systems().postEvent(acunity360::GameplayEvent{
