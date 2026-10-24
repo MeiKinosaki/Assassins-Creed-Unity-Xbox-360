@@ -11,6 +11,13 @@ int main() {
     assert(queue.size() == 0u);
     assert(!queue.tryDequeue(out));
 
+    acunity360::GameplayEventQueue zero_capacity(0u);
+    assert(zero_capacity.capacity() == 0u);
+    assert(zero_capacity.empty());
+    assert(zero_capacity.full());
+    assert(!zero_capacity.enqueue(first));
+    assert(!zero_capacity.tryDequeue(out));
+
     const acunity360::GameplayEvent first = {
         acunity360::GameplayEventType::ItemCollected, 42u, 3
     };
