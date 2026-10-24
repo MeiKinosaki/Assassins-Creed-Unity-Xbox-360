@@ -110,6 +110,13 @@ int main() {
     assert(restored.systems().objectiveTracker().configured());
     assert(restored.systems().objectiveTracker().current().completed);
 
+    storage.files["corrupt-runtime-save"] = std::vector<std::uint8_t>{1u, 2u, 3u};
+    acunity360::GameplayRuntime rejected_restore(8u, 1u, 2u);
+    assert(!rejected_restore.restoreSnapshotFromStorage("corrupt-runtime-save", storage));
+    assert(rejected_restore.state() == acunity360::RuntimeState::Uninitialized);
+    assert(rejected_restore.systems().inventory().occupiedSlots() == 0u);
+    assert(!rejected_restore.systems().objectiveTracker().configured());
+
     runtime.stop();
     assert(runtime.state() == acunity360::RuntimeState::Stopped);
     assert(!runtime.tick());
