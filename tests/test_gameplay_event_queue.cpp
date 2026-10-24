@@ -44,6 +44,20 @@ int main() {
     assert(queue.empty());
     assert(!queue.tryDequeue(out));
 
+    acunity360::GameplayEventQueue wrap_queue(3u);
+    assert(wrap_queue.enqueue(first));
+    assert(wrap_queue.enqueue(second));
+    assert(wrap_queue.enqueue(third));
+    assert(wrap_queue.tryDequeue(out) && out.subject_id == first.subject_id);
+    assert(wrap_queue.tryDequeue(out) && out.subject_id == second.subject_id);
+    assert(wrap_queue.enqueue(first));
+    assert(wrap_queue.enqueue(second));
+    assert(wrap_queue.full());
+    assert(wrap_queue.tryDequeue(out) && out.subject_id == third.subject_id);
+    assert(wrap_queue.tryDequeue(out) && out.subject_id == first.subject_id);
+    assert(wrap_queue.tryDequeue(out) && out.subject_id == second.subject_id);
+    assert(wrap_queue.empty());
+
     queue.enqueue(first);
     queue.enqueue(second);
     queue.clear();
