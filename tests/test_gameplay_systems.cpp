@@ -2,7 +2,7 @@
 #include <cassert>
 
 int main() {
-    acunity360::GameplaySystems game(4);
+    acunity360::GameplaySystems game(4, 3u);
     assert(game.objectiveTracker().configure(100u, 3u));
 
     game.postEvent(acunity360::GameplayEvent{
@@ -11,9 +11,12 @@ int main() {
     game.postEvent(acunity360::GameplayEvent{
         acunity360::GameplayEventType::ObjectiveProgress, 100u, 1
     });
-    game.postEvent(acunity360::GameplayEvent{
+    assert(game.postEvent(acunity360::GameplayEvent{
         acunity360::GameplayEventType::ObjectiveProgress, 100u, 2
-    });
+    }));
+    assert(!game.postEvent(acunity360::GameplayEvent{
+        acunity360::GameplayEventType::ItemCollected, 99u, 1
+    }));
 
     assert(game.pendingEvents() == 3u);
     assert(game.processEvents(1u) == 1u);
