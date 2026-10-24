@@ -25,6 +25,12 @@ int main() {
     assert(loaded.objective_progress == 1u);
     assert(loaded.items.size() == 1u && loaded.items[0].quantity == 2u);
 
+    const std::vector<std::uint8_t> oversized(
+        acunity360::SaveDataCodec::kMaxEncodedSize + 1u, 1u);
+    assert(!storage.writeAll(path, oversized));
+    assert(acunity360::SaveStorageService::load(loaded, storage, path));
+    assert(loaded.objective_id == 3u);
+
     std::vector<std::uint8_t> unchanged(1u, 77u);
     assert(!storage.readAll("", unchanged));
     assert(unchanged.size() == 1u && unchanged[0] == 77u);
@@ -38,6 +44,18 @@ int main() {
     }
     assert(!acunity360::SaveStorageService::load(loaded, storage, path));
     assert(loaded.objective_id == 3u);
+
+    {
+        std::ofstream file(path.c_str(), std::ios::binary | std::ios::trunc);
+        assert(file);
+        const std::vector<std::uint8_t> too_large(
+            acunity360::SaveDataCodec::kMaxEncodedSize + 1u, 2u);
+        file.write(reinterpret_cast<const char*>(&too_large[0]),
+                   static_cast<std::streamsize>(too_large.size()));
+    }
+    unchanged.assign(1u, 77u);
+    assert(!storage.readAll(path, unchanged));
+    assert(unchanged.size() == 1u && unchanged[0] == 77u);
 
     assert(std::remove(path.c_str()) == 0);
     assert(!storage.readAll(path, unchanged));
