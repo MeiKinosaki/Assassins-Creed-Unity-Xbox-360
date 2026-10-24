@@ -105,7 +105,7 @@ int main() {
 
     assert(runtime.saveSnapshot("runtime-save"));
     acunity360::GameplayRuntime restored(8u, 1u, 2u);
-    assert(restored.restoreSnapshotFromStorage("runtime-save"));
+    assert(restored.restoreSnapshotFromStorage("runtime-save", storage));
     assert(restored.systems().inventory().count(88u) == 2u);
     assert(restored.systems().objectiveTracker().configured());
     assert(restored.systems().objectiveTracker().current().completed);
