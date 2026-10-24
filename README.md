@@ -14,6 +14,7 @@ This repository is an **experimental, independent porting/reimplementation scaff
 - Adapter that captures/restores inventory, objective progress and equipment.
 - Storage bridge that encodes/decodes save snapshots through an injected storage service, rejects oversized input at the storage boundary, and preserves output state when reads fail.
 - Bounded desktop/reference file-storage backend with round-trip and failure-safety tests; this is not an Xbox 360 save-data backend.
+- Runtime-level snapshot save/restore integration through the storage abstraction, with tests for fresh-runtime restoration and rejection of corrupt save payloads.
 - CMake build and GitHub Actions tests using standard C++11.
 
 These are generic foundation modules. They are not yet connected to the original game's engine, animation, combat, AI, missions, renderer, audio, or world data.
