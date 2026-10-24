@@ -35,7 +35,7 @@ int main() {
         acunity360::SaveDataCodec::kMaxEncodedSize + 1u, 1u);
     assert(!storage.writeAll(path, oversized));
     assert(acunity360::SaveStorageService::load(loaded, storage, path));
-    assert(loaded.objective_id == 3u);
+    assert(loaded.objective_id == 4u);
 
     std::vector<std::uint8_t> unchanged(1u, 77u);
     assert(!storage.readAll("", unchanged));
@@ -49,7 +49,7 @@ int main() {
                    static_cast<std::streamsize>(invalid.size()));
     }
     assert(!acunity360::SaveStorageService::load(loaded, storage, path));
-    assert(loaded.objective_id == 3u);
+    assert(loaded.objective_id == 4u);
 
     {
         std::ofstream file(path.c_str(), std::ios::binary | std::ios::trunc);
