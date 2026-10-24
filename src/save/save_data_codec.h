@@ -27,6 +27,9 @@ public:
     static const std::uint32_t kMagic = 0x30365541u;
     static const std::uint16_t kVersion = 2u;
     static const std::size_t kMaxItems = 256u;
+    static const std::size_t kHeaderSize = 32u;
+    static const std::size_t kChecksumSize = 4u;
+    static const std::size_t kMaxEncodedSize = kHeaderSize + kMaxItems * 8u + kChecksumSize;
 
     static bool encode(const SaveSnapshot& snapshot, std::vector<std::uint8_t>& out) {
         if (snapshot.items.size() > kMaxItems) return false;
@@ -58,7 +61,8 @@ public:
     }
 
     static bool decode(const std::vector<std::uint8_t>& bytes, SaveSnapshot& out) {
-        const std::size_t header_size = 4u + 2u + 2u + 4u + 4u + 4u + 4u + 4u + 4u;
+        const std::size_t header_size = kHeaderSize;
+        if (bytes.size() > kMaxEncodedSize) return false;
         if (bytes.size() < header_size + 4u) return false;
         if (read32(bytes, 0u) != kMagic || read16(bytes, 4u) != kVersion) return false;
         const std::uint16_t count = read16(bytes, 6u);
