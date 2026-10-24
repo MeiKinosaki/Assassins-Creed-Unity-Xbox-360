@@ -22,9 +22,14 @@ public:
     void postEvent(const GameplayEvent& event) { events_.enqueue(event); }
 
     std::size_t processEvents() {
+        return processEvents(static_cast<std::size_t>(-1));
+    }
+
+    // Bounded processing prevents a single frame from draining an unbounded queue.
+    std::size_t processEvents(std::size_t max_events) {
         std::size_t processed = 0;
         GameplayEvent event = { GameplayEventType::ObjectiveProgress, 0u, 0 };
-        while (events_.tryDequeue(event)) {
+        while (processed < max_events && events_.tryDequeue(event)) {
             if (event.value > 0) {
                 const std::uint32_t amount = static_cast<std::uint32_t>(event.value);
                 switch (event.type) {
