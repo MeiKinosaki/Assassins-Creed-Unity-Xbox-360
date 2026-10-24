@@ -31,7 +31,11 @@ int main() {
 
     std::vector<std::uint8_t> corrupt = bytes;
     corrupt[8] ^= 1u;
+    const std::uint32_t preserved_objective_id = decoded.objective_id;
+    const std::size_t preserved_item_count = decoded.items.size();
     assert(!acunity360::SaveDataCodec::decode(corrupt, decoded));
+    assert(decoded.objective_id == preserved_objective_id);
+    assert(decoded.items.size() == preserved_item_count);
 
     std::vector<std::uint8_t> truncated = bytes;
     truncated.pop_back();
