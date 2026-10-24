@@ -47,15 +47,23 @@ public:
             }
         }
 
+        // Build the complete restored state away from the destination first.
+        // Any validation or component operation failure leaves 'game' untouched.
+        GameplaySystems candidate(game.inventory().capacity());
         for (std::size_t i = 0; i < snapshot.items.size(); ++i) {
-            if (!game.inventory().add(snapshot.items[i].item_id, snapshot.items[i].quantity)) return false;
+            if (!candidate.inventory().add(snapshot.items[i].item_id, snapshot.items[i].quantity)) return false;
         }
         if (snapshot.objective_id != 0u) {
-            if (!game.objectiveTracker().configure(snapshot.objective_id, snapshot.objective_required)) return false;
+            if (!candidate.objectiveTracker().configure(snapshot.objective_id, snapshot.objective_required)) return false;
             if (snapshot.objective_progress > 0u &&
-                !game.objectiveTracker().advance(snapshot.objective_id, snapshot.objective_progress)) return false;
+                !candidate.objectiveTracker().advance(snapshot.objective_id, snapshot.objective_progress)) return false;
         }
-        game.equipment().restore(snapshot.equipment);
+        if (!candidate.equipment().restore(snapshot.equipment)) return false;
+
+        // Commit only after the staged state is complete.
+        game.inventory() = candidate.inventory();
+        game.objectiveTracker() = candidate.objectiveTracker();
+        game.equipment() = candidate.equipment();
         return true;
     }
 };
