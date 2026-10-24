@@ -1,5 +1,6 @@
 #include "../src/gameplay/gameplay_runtime.h"
 #include <cassert>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -18,8 +19,18 @@ public:
 };
 class FakeStorage : public acunity360::IStorage {
 public:
-    bool readAll(const std::string&, std::vector<std::uint8_t>&) override { return false; }
-    bool writeAll(const std::string&, const std::vector<std::uint8_t>&) override { return false; }
+    std::map<std::string, std::vector<std::uint8_t> > files;
+    bool readAll(const std::string& path, std::vector<std::uint8_t>& out) override {
+        const std::map<std::string, std::vector<std::uint8_t> >::const_iterator it = files.find(path);
+        if (it == files.end()) return false;
+        out = it->second;
+        return true;
+    }
+    bool writeAll(const std::string& path, const std::vector<std::uint8_t>& data) override {
+        if (path.empty()) return false;
+        files[path] = data;
+        return true;
+    }
 };
 class FakeLogger : public acunity360::ILogger {
 public:
@@ -91,6 +102,13 @@ int main() {
     assert(runtime.elapsedMilliseconds() == 64u);
     assert(runtime.systems().pendingEvents() == 0u);
     assert(runtime.systems().inventory().count(88u) == 2u);
+
+    assert(runtime.saveSnapshot("runtime-save"));
+    acunity360::GameplayRuntime restored(8u, 1u, 2u);
+    assert(restored.restoreSnapshotFromStorage("runtime-save"));
+    assert(restored.systems().inventory().count(88u) == 2u);
+    assert(restored.systems().objectiveTracker().configured());
+    assert(restored.systems().objectiveTracker().current().completed);
 
     runtime.stop();
     assert(runtime.state() == acunity360::RuntimeState::Stopped);
