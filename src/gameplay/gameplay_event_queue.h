@@ -2,7 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <queue>
+#include <vector>
 
 namespace acunity360 {
 
@@ -23,33 +23,39 @@ struct GameplayEvent {
 class GameplayEventQueue {
 public:
     explicit GameplayEventQueue(std::size_t capacity = 1024u)
-        : capacity_(capacity) {}
+        : capacity_(capacity), storage_(capacity), head_(0u), size_(0u) {}
 
     bool enqueue(const GameplayEvent& event) {
-        if (events_.size() >= capacity_) return false;
-        events_.push(event);
+        if (size_ >= capacity_) return false;
+        const std::size_t tail = (head_ + size_) % capacity_;
+        storage_[tail] = event;
+        ++size_;
         return true;
     }
 
     bool tryDequeue(GameplayEvent& out_event) {
-        if (events_.empty()) return false;
-        out_event = events_.front();
-        events_.pop();
+        if (size_ == 0u) return false;
+        out_event = storage_[head_];
+        head_ = (head_ + 1u) % capacity_;
+        --size_;
         return true;
     }
 
-    std::size_t size() const { return events_.size(); }
+    std::size_t size() const { return size_; }
     std::size_t capacity() const { return capacity_; }
-    bool full() const { return events_.size() >= capacity_; }
-    bool empty() const { return events_.empty(); }
+    bool full() const { return size_ >= capacity_; }
+    bool empty() const { return size_ == 0u; }
 
     void clear() {
-        while (!events_.empty()) events_.pop();
+        head_ = 0u;
+        size_ = 0u;
     }
 
 private:
     std::size_t capacity_;
-    std::queue<GameplayEvent> events_;
+    std::vector<GameplayEvent> storage_;
+    std::size_t head_;
+    std::size_t size_;
 };
 
 } // namespace acunity360
