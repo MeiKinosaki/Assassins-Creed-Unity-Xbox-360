@@ -25,6 +25,12 @@ int main() {
     assert(loaded.objective_progress == 1u);
     assert(loaded.items.size() == 1u && loaded.items[0].quantity == 2u);
 
+    acunity360::SaveSnapshot replacement = source;
+    replacement.objective_id = 4u;
+    assert(acunity360::SaveStorageService::save(replacement, storage, path));
+    assert(acunity360::SaveStorageService::load(loaded, storage, path));
+    assert(loaded.objective_id == 4u);
+
     const std::vector<std::uint8_t> oversized(
         acunity360::SaveDataCodec::kMaxEncodedSize + 1u, 1u);
     assert(!storage.writeAll(path, oversized));
