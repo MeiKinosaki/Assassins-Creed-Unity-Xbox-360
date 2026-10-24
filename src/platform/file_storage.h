@@ -43,14 +43,35 @@ public:
 
     bool writeAll(const std::string& path, const std::vector<std::uint8_t>& data) override {
         if (path.empty() || data.size() > SaveDataCodec::kMaxEncodedSize) return false;
-        std::ofstream file(path.c_str(), std::ios::binary | std::ios::trunc);
-        if (!file) return false;
-        if (!data.empty()) {
-            file.write(reinterpret_cast<const char*>(&data[0]),
-                       static_cast<std::streamsize>(data.size()));
+
+        // Stage the full payload before replacing the destination. Filesystems
+        // with atomic rename replacement avoid exposing a partial save.
+        const std::string temporary_path = path + ".tmp";
+        {
+            std::ofstream file(temporary_path.c_str(), std::ios::binary | std::ios::trunc);
+            if (!file) return false;
+            if (!data.empty()) {
+                file.write(reinterpret_cast<const char*>(&data[0]),
+                           static_cast<std::streamsize>(data.size()));
+            }
+            file.flush();
+            if (!file) {
+                file.close();
+                std::remove(temporary_path.c_str());
+                return false;
+            }
+            file.close();
+            if (!file) {
+                std::remove(temporary_path.c_str());
+                return false;
+            }
         }
-        file.flush();
-        return static_cast<bool>(file);
+
+        if (std::rename(temporary_path.c_str(), path.c_str()) != 0) {
+            std::remove(temporary_path.c_str());
+            return false;
+        }
+        return true;
     }
 };
 
