@@ -22,8 +22,13 @@ struct GameplayEvent {
 // It deliberately has no dependency on Xbox-specific APIs.
 class GameplayEventQueue {
 public:
-    void enqueue(const GameplayEvent& event) {
+    explicit GameplayEventQueue(std::size_t capacity = 1024u)
+        : capacity_(capacity) {}
+
+    bool enqueue(const GameplayEvent& event) {
+        if (events_.size() >= capacity_) return false;
         events_.push(event);
+        return true;
     }
 
     bool tryDequeue(GameplayEvent& out_event) {
@@ -34,6 +39,8 @@ public:
     }
 
     std::size_t size() const { return events_.size(); }
+    std::size_t capacity() const { return capacity_; }
+    bool full() const { return events_.size() >= capacity_; }
     bool empty() const { return events_.empty(); }
 
     void clear() {
@@ -41,6 +48,7 @@ public:
     }
 
 private:
+    std::size_t capacity_;
     std::queue<GameplayEvent> events_;
 };
 
