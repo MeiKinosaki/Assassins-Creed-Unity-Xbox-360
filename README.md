@@ -4,8 +4,8 @@ This repository is an **experimental, independent porting/reimplementation scaff
 
 ## Current portable gameplay core
 
-- Inventory stacks with capacity and quantity validation.
-- FIFO gameplay event queue.
+- Inventory stacks with capacity and quantity validation, including slot availability and slot reuse.
+- FIFO gameplay event queue with bounded per-frame processing to limit frame spikes.
 - Single-objective progress tracker.
 - Equipment loadout slots: main hand, tool, outfit.
 - Platform-service interfaces for clock, input, storage and logging, ready for platform-specific implementations.
