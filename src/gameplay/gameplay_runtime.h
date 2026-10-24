@@ -19,8 +19,9 @@ enum class RuntimeState : std::uint8_t {
 class GameplayRuntime {
 public:
     explicit GameplayRuntime(std::uint32_t inventory_capacity,
-                             std::size_t max_events_per_tick = 64u)
-        : systems_(inventory_capacity), services_(), state_(RuntimeState::Uninitialized),
+                             std::size_t max_events_per_tick = 64u,
+                             std::size_t event_capacity = 1024u)
+        : systems_(inventory_capacity, event_capacity), services_(), state_(RuntimeState::Uninitialized),
           last_tick_ms_(0u), elapsed_ms_(0u), frame_count_(0u),
           max_events_per_tick_(max_events_per_tick), pause_was_pressed_(false) {}
 
@@ -75,6 +76,8 @@ public:
     RuntimeState state() const { return state_; }
     std::uint64_t elapsedMilliseconds() const { return elapsed_ms_; }
     std::uint64_t frameCount() const { return frame_count_; }
+    std::size_t maxEventsPerTick() const { return max_events_per_tick_; }
+    std::size_t pendingEvents() const { return systems_.pendingEvents(); }
     GameplaySystems& systems() { return systems_; }
     const GameplaySystems& systems() const { return systems_; }
 
