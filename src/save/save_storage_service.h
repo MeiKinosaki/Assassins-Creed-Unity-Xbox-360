@@ -26,6 +26,7 @@ public:
         if (path.empty()) return false;
         std::vector<std::uint8_t> bytes;
         if (!storage.readAll(path, bytes)) return false;
+        if (bytes.size() > SaveDataCodec::kMaxEncodedSize) return false;
         SaveSnapshot candidate;
         if (!SaveDataCodec::decode(bytes, candidate)) return false;
         out = candidate;
