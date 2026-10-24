@@ -85,9 +85,14 @@ public:
     }
 
     bool restoreSnapshotFromStorage(const std::string& path) {
-        if (state_ != RuntimeState::Uninitialized || services_.storage == 0) return false;
+        if (services_.storage == 0) return false;
+        return restoreSnapshotFromStorage(path, *services_.storage);
+    }
+
+    bool restoreSnapshotFromStorage(const std::string& path, IStorage& storage) {
+        if (state_ != RuntimeState::Uninitialized) return false;
         SaveSnapshot snapshot;
-        if (!SaveStorageService::load(snapshot, *services_.storage, path)) return false;
+        if (!SaveStorageService::load(snapshot, storage, path)) return false;
         return GameplaySaveAdapter::restoreIntoFreshGame(snapshot, systems_);
     }
 
