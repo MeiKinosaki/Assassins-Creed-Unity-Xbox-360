@@ -3,6 +3,7 @@
 #include "gameplay_systems.h"
 #include "../platform/platform_services.h"
 
+#include <cstddef>
 #include <cstdint>
 
 namespace acunity360 {
@@ -17,9 +18,11 @@ enum class RuntimeState : std::uint8_t {
 // Portable orchestration only; this is not an Xbox 360 platform backend.
 class GameplayRuntime {
 public:
-    explicit GameplayRuntime(std::uint32_t inventory_capacity)
+    explicit GameplayRuntime(std::uint32_t inventory_capacity,
+                             std::size_t max_events_per_tick = 64u)
         : systems_(inventory_capacity), services_(), state_(RuntimeState::Uninitialized),
-          last_tick_ms_(0u), elapsed_ms_(0u), frame_count_(0u), pause_was_pressed_(false) {}
+          last_tick_ms_(0u), elapsed_ms_(0u), frame_count_(0u),
+          max_events_per_tick_(max_events_per_tick), pause_was_pressed_(false) {}
 
     bool initialize(const PlatformServices& services) {
         if (state_ != RuntimeState::Uninitialized || !services.complete()) {
@@ -53,7 +56,7 @@ public:
         pause_was_pressed_ = pause_pressed;
 
         if (state_ == RuntimeState::Running) {
-            systems_.processEvents();
+            systems_.processEvents(max_events_per_tick_);
             ++frame_count_;
         }
         return true;
@@ -82,6 +85,7 @@ private:
     std::uint64_t last_tick_ms_;
     std::uint64_t elapsed_ms_;
     std::uint64_t frame_count_;
+    std::size_t max_events_per_tick_;
     bool pause_was_pressed_;
 };
 
