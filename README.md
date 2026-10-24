@@ -12,6 +12,7 @@ This repository is an **experimental, independent porting/reimplementation scaff
 - Portable runtime lifecycle with timing, pause/resume edge detection, configurable event queue capacity, bounded per-frame event processing, and stop state.
 - Versioned little-endian save snapshot codec with a checksum.
 - Adapter that captures/restores inventory, objective progress and equipment.
+- Storage bridge that encodes/decodes save snapshots through an injected storage service, preserving output state when reads fail.
 - CMake build and GitHub Actions tests using standard C++11.
 
 These are generic foundation modules. They are not yet connected to the original game's engine, animation, combat, AI, missions, renderer, audio, or world data.
@@ -34,8 +35,8 @@ No Xbox 360-targeted build, `default.xex`, console boot, frame rate, or compatib
 
 ## Next technical milestones
 
-1. Keep portable tests green and add malformed-save/boundary cases.
-2. Define a platform abstraction for logging, file I/O, input and timing.
+1. Keep portable tests green and expand malformed-save/boundary coverage.
+2. Implement and test a concrete platform storage backend behind the storage interface.
 3. Verify which Xbox 360 homebrew SDK/toolchain can compile the minimal platform target.
 4. Produce and test a minimal target executable before attempting larger game systems.
 5. Implement game-specific systems only with source code and assets the project is authorized to use.
