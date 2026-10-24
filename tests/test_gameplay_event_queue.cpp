@@ -2,7 +2,7 @@
 #include <cassert>
 
 int main() {
-    acunity360::GameplayEventQueue queue;
+    acunity360::GameplayEventQueue queue(3u);
     acunity360::GameplayEvent out = {
         acunity360::GameplayEventType::ObjectiveProgress, 0u, 0
     };
@@ -21,10 +21,12 @@ int main() {
         acunity360::GameplayEventType::InteractionCompleted, 9u, -1
     };
 
-    queue.enqueue(first);
-    queue.enqueue(second);
-    queue.enqueue(third);
+    assert(queue.enqueue(first));
+    assert(queue.enqueue(second));
+    assert(queue.enqueue(third));
     assert(queue.size() == 3u);
+    assert(queue.full());
+    assert(!queue.enqueue(first));
 
     assert(queue.tryDequeue(out));
     assert(out.type == first.type && out.subject_id == 42u && out.value == 3);
