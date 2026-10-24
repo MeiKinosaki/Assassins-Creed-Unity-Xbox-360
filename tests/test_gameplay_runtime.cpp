@@ -41,7 +41,7 @@ int main() {
     services.storage = &storage;
     services.logger = &logger;
 
-    acunity360::GameplayRuntime runtime(8u);
+    acunity360::GameplayRuntime runtime(8u, 1u);
     assert(runtime.state() == acunity360::RuntimeState::Uninitialized);
     assert(!runtime.tick());
     assert(!runtime.initialize(acunity360::PlatformServices()));
@@ -52,11 +52,16 @@ int main() {
     runtime.systems().postEvent(acunity360::GameplayEvent{
         acunity360::GameplayEventType::ObjectiveProgress, 7u, 1
     });
+    runtime.systems().postEvent(acunity360::GameplayEvent{
+        acunity360::GameplayEventType::ItemCollected, 88u, 2
+    });
     clock.now = 16u;
     assert(runtime.tick());
     assert(runtime.frameCount() == 1u);
     assert(runtime.elapsedMilliseconds() == 16u);
     assert(runtime.systems().objectiveTracker().current().completed);
+    assert(runtime.systems().pendingEvents() == 1u);
+    assert(runtime.systems().inventory().count(88u) == 0u);
 
     input.pause = true;
     clock.now = 32u;
@@ -76,6 +81,8 @@ int main() {
     assert(runtime.state() == acunity360::RuntimeState::Running);
     assert(runtime.frameCount() == 2u);
     assert(runtime.elapsedMilliseconds() == 64u);
+    assert(runtime.systems().pendingEvents() == 0u);
+    assert(runtime.systems().inventory().count(88u) == 2u);
 
     runtime.stop();
     assert(runtime.state() == acunity360::RuntimeState::Stopped);
