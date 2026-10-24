@@ -54,6 +54,11 @@ int main() {
     assert(!acunity360::SaveStorageService::load(preserved, storage, "broken"));
     assert(preserved.objective_id == 88u);
 
+    storage.files["oversized"] = std::vector<std::uint8_t>(
+        acunity360::SaveDataCodec::kMaxEncodedSize + 1u, 0u);
+    assert(!acunity360::SaveStorageService::load(preserved, storage, "oversized"));
+    assert(preserved.objective_id == 88u);
+
     storage.fail_write = true;
     assert(!acunity360::SaveStorageService::save(source, storage, "slot2"));
     storage.fail_write = false;
