@@ -2,6 +2,9 @@
 
 #include "gameplay_systems.h"
 #include "../platform/platform_services.h"
+#include "../save/gameplay_save_adapter.h"
+#include "../save/save_storage_service.h"
+#include <string>
 
 #include <cstddef>
 #include <cstdint>
@@ -71,6 +74,21 @@ public:
         if (services_.logger != 0) {
             services_.logger->info("Gameplay runtime stopped");
         }
+    }
+
+    bool saveSnapshot(const std::string& path) {
+        if (state_ == RuntimeState::Uninitialized || state_ == RuntimeState::Stopped ||
+            services_.storage == 0) return false;
+        SaveSnapshot snapshot;
+        if (!GameplaySaveAdapter::capture(systems_, snapshot)) return false;
+        return SaveStorageService::save(snapshot, *services_.storage, path);
+    }
+
+    bool restoreSnapshotFromStorage(const std::string& path) {
+        if (state_ != RuntimeState::Uninitialized || services_.storage == 0) return false;
+        SaveSnapshot snapshot;
+        if (!SaveStorageService::load(snapshot, *services_.storage, path)) return false;
+        return GameplaySaveAdapter::restoreIntoFreshGame(snapshot, systems_);
     }
 
     RuntimeState state() const { return state_; }
