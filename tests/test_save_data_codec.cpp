@@ -54,5 +54,11 @@ int main() {
     invalid.items.push_back(acunity360::SaveItem{7u, 1u});
     invalid.items.push_back(acunity360::SaveItem{7u, 2u});
     assert(!acunity360::SaveDataCodec::encode(invalid, bytes));
+
+    std::vector<std::uint8_t> empty;
+    assert(!acunity360::SaveDataCodec::decode(empty, decoded));
+    std::vector<std::uint8_t> oversized(
+        acunity360::SaveDataCodec::kMaxEncodedSize + 1u, 0u);
+    assert(!acunity360::SaveDataCodec::decode(oversized, decoded));
     return 0;
 }
