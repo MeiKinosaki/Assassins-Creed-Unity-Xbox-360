@@ -25,6 +25,7 @@ foreach(test_name
     test_platform_services
     test_gameplay_runtime
     test_save_storage_service
+    test_file_storage
 )
     add_executable(${test_name} tests/${test_name}.cpp)
     target_link_libraries(${test_name} PRIVATE acunity360_gameplay)
