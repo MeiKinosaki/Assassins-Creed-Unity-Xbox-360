@@ -5,11 +5,11 @@ This repository is an **experimental, independent porting/reimplementation scaff
 ## Current portable gameplay core
 
 - Inventory stacks with capacity and quantity validation, including slot availability and slot reuse.
-- FIFO gameplay event queue with bounded per-frame processing to limit frame spikes.
+- Capacity-limited FIFO gameplay event queue with explicit overflow rejection and bounded per-frame processing to limit frame spikes.
 - Single-objective progress tracker.
 - Equipment loadout slots: main hand, tool, outfit.
 - Platform-service interfaces for clock, input, storage and logging, ready for platform-specific implementations.
-- Portable runtime lifecycle with timing, pause/resume edge detection, event processing, and stop state.
+- Portable runtime lifecycle with timing, pause/resume edge detection, configurable event queue capacity, bounded per-frame event processing, and stop state.
 - Versioned little-endian save snapshot codec with a checksum.
 - Adapter that captures/restores inventory, objective progress and equipment.
 - CMake build and GitHub Actions tests using standard C++11.
