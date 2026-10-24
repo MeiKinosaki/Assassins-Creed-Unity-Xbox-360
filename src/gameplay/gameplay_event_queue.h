@@ -26,7 +26,7 @@ public:
         : capacity_(capacity), storage_(capacity), head_(0u), size_(0u) {}
 
     bool enqueue(const GameplayEvent& event) {
-        if (size_ >= capacity_) return false;
+        if (size_ >= capacity_ || capacity_ == 0u) return false;
         const std::size_t tail = (head_ + size_) % capacity_;
         storage_[tail] = event;
         ++size_;
@@ -36,7 +36,7 @@ public:
     bool tryDequeue(GameplayEvent& out_event) {
         if (size_ == 0u) return false;
         out_event = storage_[head_];
-        head_ = (head_ + 1u) % capacity_;
+        head_ = capacity_ == 0u ? 0u : (head_ + 1u) % capacity_;
         --size_;
         return true;
     }
