@@ -11,7 +11,7 @@ This repository is an **experimental, independent porting/reimplementation scaff
 - Platform-service interfaces for clock, input, storage and logging, ready for platform-specific implementations.
 - Portable runtime lifecycle with timing, pause/resume edge detection, configurable event queue capacity, bounded per-frame event processing, and stop state.
 - Versioned little-endian save snapshot codec with a checksum.
-- Adapter that captures/restores inventory, objective progress and equipment.
+- Adapter that captures/restores inventory, objective progress and equipment; restore stages the target state before committing it, so invalid snapshots are rejected without partially applying changes.
 - Storage bridge that encodes/decodes save snapshots through an injected storage service, rejects oversized input at the storage boundary, and preserves output state when reads fail.
 - Bounded desktop/reference file-storage backend with round-trip and failure-safety tests; this is not an Xbox 360 save-data backend.
 - Runtime-level snapshot save/restore integration through the storage abstraction, with tests for fresh-runtime restoration and rejection of corrupt save payloads.
