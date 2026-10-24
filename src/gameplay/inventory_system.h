@@ -46,6 +46,8 @@ public:
         return false;
     }
 
+    bool canAddNewItem() const { return stacks_.size() < capacity_; }
+
     std::uint32_t count(std::uint32_t item_id) const {
         for (std::vector<InventoryStack>::const_iterator it = stacks_.begin();
              it != stacks_.end(); ++it) {
