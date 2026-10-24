@@ -16,7 +16,12 @@ int main() {
     });
 
     assert(game.pendingEvents() == 3u);
-    assert(game.processEvents() == 3u);
+    assert(game.processEvents(1u) == 1u);
+    assert(game.pendingEvents() == 2u);
+    assert(game.inventory().count(55u) == 2u);
+    assert(game.processEvents(1u) == 1u);
+    assert(game.pendingEvents() == 1u);
+    assert(game.processEvents() == 1u);
     assert(game.pendingEvents() == 0u);
     assert(game.inventory().count(55u) == 2u);
     assert(game.objectiveTracker().current().completed);
