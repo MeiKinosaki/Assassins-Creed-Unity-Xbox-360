@@ -9,8 +9,9 @@ namespace acunity360 {
 
 class GameplaySystems {
 public:
-    explicit GameplaySystems(std::uint32_t inventory_capacity)
-        : inventory_(inventory_capacity), objectives_(), equipment_(), events_() {}
+    explicit GameplaySystems(std::uint32_t inventory_capacity,
+                             std::size_t event_capacity = 1024u)
+        : inventory_(inventory_capacity), objectives_(), equipment_(), events_(event_capacity) {}
 
     InventorySystem& inventory() { return inventory_; }
     const InventorySystem& inventory() const { return inventory_; }
@@ -19,7 +20,7 @@ public:
     EquipmentSystem& equipment() { return equipment_; }
     const EquipmentSystem& equipment() const { return equipment_; }
 
-    void postEvent(const GameplayEvent& event) { events_.enqueue(event); }
+    bool postEvent(const GameplayEvent& event) { return events_.enqueue(event); }
 
     std::size_t processEvents() {
         return processEvents(static_cast<std::size_t>(-1));
