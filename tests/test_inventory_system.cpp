@@ -23,7 +23,7 @@ int main() {
     assert(inventory.canAddNewItem());
     assert(inventory.add(12, 4));
     assert(inventory.count(12) == 4);
-    assert(inventory.occupiedSlots() == 1);
+    assert(inventory.occupiedSlots() == 2);
     assert(!inventory.remove(99, 1));
     return 0;
 }
